@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "./redux/actions/userDetailsActions";
 import { decryptData, encryptData } from "./helper/encodeDecode";
 import { Icon } from "./IconsMap";
+import Chat from "./components/Chat";
 
 function App() {
   const { user, status: userStatus } = useSelector(
@@ -49,12 +50,17 @@ function App() {
 
   if (!user && !tokenCode) return <Login />;
 
+  const otherUser =
+    user?.code === "me@123"
+      ? { username: "other", code: "other@123" }
+      : { username: "me", code: "me@123" };
+
   if (user)
     return (
       <div className="p-4">
         <Logout />
         <h1 className="text-xl font-bold">Welcome, {user.username}</h1>
-        {/* Load Chat UI Here */}
+        <Chat currentUser={user} otherUser={otherUser} />
       </div>
     );
   return (
