@@ -6,6 +6,7 @@ const userDetailsReducer = createSlice({
   name: "userDetails",
   initialState: {
     user: null,
+    chatUser: null,
     status: "idle", // 'idle' | 'pending' | 'succeeded' | 'failed'
     error: null,
   },
@@ -14,6 +15,7 @@ const userDetailsReducer = createSlice({
       state.user = null;
       state.status = "idle";
       state.error = null;
+      state.chatUser = null;
     },
   },
   extraReducers: (builder) => {
@@ -24,7 +26,8 @@ const userDetailsReducer = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.user = action.payload;
+        state.user = action.payload.user;
+        state.chatUser = action.payload.chatUser;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {

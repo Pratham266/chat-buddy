@@ -4,10 +4,13 @@ import {
   getOrCreateChatId,
   listenToMessages,
   listenToTypingStatus,
+  listenToUserStatus,
   sendMessage,
   setTypingStatus,
 } from "../services/messageService";
 import Logout from "./Logout";
+import { formatLastSeen } from "../helper/dateTimeFormater";
+import { Icon } from "../IconsMap";
 
 // const widowInnerHeight = window.innerHeight;
 
@@ -16,16 +19,25 @@ const Chat = ({ currentUser, otherUser }) => {
   const [inputMessage, setInputMessage] = useState("");
   const [isOtherTyping, setIsOtherTyping] = useState(false);
   const typingTimeout = useRef(null);
+  const [status, setStatus] = useState({ isOnline: false, lastSeen: null });
 
   useEffect(() => {
+    let unsubscribeMessages = () => {};
+    let unsubscribeTyping = () => {};
+    let unsubscribeOtherUserStatus = () => {};
+
     const initChat = async () => {
       const chatId = await getOrCreateChatId(currentUser.code, otherUser.code);
 
-      const unsubscribeMessages = listenToMessages(chatId, (msgs) => {
-        setMessages(msgs);
-      });
+      unsubscribeMessages = listenToMessages(
+        chatId,
+        currentUser.code,
+        (msgs) => {
+          setMessages(msgs);
+        }
+      );
 
-      const unsubscribeTyping = listenToTypingStatus(
+      unsubscribeTyping = listenToTypingStatus(
         chatId,
         otherUser.code,
         (isTyping) => {
@@ -33,15 +45,21 @@ const Chat = ({ currentUser, otherUser }) => {
         }
       );
 
-      return () => {
-        unsubscribeMessages();
-        unsubscribeTyping();
-      };
+      unsubscribeOtherUserStatus = listenToUserStatus(
+        otherUser.userId,
+        setStatus
+      );
     };
 
     if (currentUser && otherUser) {
       initChat();
     }
+
+    return () => {
+      unsubscribeMessages();
+      unsubscribeTyping();
+      unsubscribeOtherUserStatus();
+    };
   }, [currentUser, otherUser]);
 
   const handleInputChange = async (e) => {
@@ -76,7 +94,10 @@ const Chat = ({ currentUser, otherUser }) => {
         <button id="login" className="hover:bg-blue-400 rounded-md p-1">
           userProfile
         </button>
-        <span>{currentUser.username}</span>
+        <span>{otherUser.username}</span>
+        <div className="text-sm text-gray-500">
+          {status.isOnline ? "Online" : formatLastSeen(status.lastSeen)}
+        </div>
         <div className="relative inline-block text-left">
           <Logout />
         </div>
@@ -100,6 +121,12 @@ const Chat = ({ currentUser, otherUser }) => {
               >
                 {msg.text}
               </div>
+              {msg.senderId === currentUser.code && (
+                <Icon
+                  name={`${msg.status === "S" ? "doubleTick" : "singleTick"}`}
+                  size={20}
+                />
+              )}
             </div>
           ))}
           {isOtherTyping && (
@@ -123,31 +150,7 @@ const Chat = ({ currentUser, otherUser }) => {
           className="bg-blue-500 text-white rounded-full p-2 ml-2 hover:bg-blue-600 focus:outline-none"
           onClick={handleSend}
         >
-          <svg
-            width="20px"
-            height="20px"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            stroke="#ffffff"
-          >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g
-              id="SVGRepo_tracerCarrier"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            ></g>
-            <g id="SVGRepo_iconCarrier">
-              {" "}
-              <path
-                d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61359 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.6367 14.1886C19.1797 13.4942 19.9512 13.1471 20.1896 12.6648C20.3968 12.2458 20.3968 11.7541 20.1896 11.3351C19.9512 10.8529 19.1797 10.5057 17.6367 9.81135L7.48483 5.24303C5.90879 4.53382 5.12078 4.17921 4.59799 4.32468C4.14397 4.45101 3.77572 4.78336 3.60365 5.22209C3.40551 5.72728 3.67772 6.54741 4.22215 8.18767L5.24829 11.2793C5.34179 11.561 5.38855 11.7019 5.407 11.8459C5.42338 11.9738 5.42321 12.1032 5.40651 12.231C5.38768 12.375 5.34057 12.5157 5.24634 12.7972Z"
-                stroke="#ffffff"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>{" "}
-            </g>
-          </svg>
+          send message
         </button>
       </div>
     </div>

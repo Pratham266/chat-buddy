@@ -3,12 +3,15 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -38,6 +41,7 @@ export const sendMessage = async (chatId, senderId, receiverId, text) => {
     receiverId,
     text,
     timestamp: serverTimestamp(),
+    status: "P",
   });
 
   // Update parent chat doc with last message
@@ -48,17 +52,31 @@ export const sendMessage = async (chatId, senderId, receiverId, text) => {
   });
 };
 
-export const listenToMessages = (chatId, callback) => {
+export const listenToMessages = (chatId, currentUserCode, callback) => {
   const q = query(
     collection(db, "chats", chatId, "messages"),
     orderBy("timestamp", "asc")
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const messages = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+  return onSnapshot(q, async (snapshot) => {
+    const batch = writeBatch(db);
+    const messages = snapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      // If the message is for current user and is still pending, mark it as seen
+
+      if (data.receiverId === currentUserCode && data.status === "P") {
+        const msgRef = doc.ref;
+        batch.update(msgRef, { status: "S" });
+      }
+
+      return {
+        id: doc.id,
+        ...data,
+      };
+    });
+
+    await batch.commit(); // apply status updates
     callback(messages);
   });
 };
@@ -82,5 +100,26 @@ export const listenToTypingStatus = (chatId, userCode, callback) => {
     const data = docSnap.data();
     const isTyping = data?.typing?.[userCode] || false;
     callback(isTyping);
+  });
+};
+
+export const updateOnlineStatus = async (userId, isOnline) => {
+  const userRef = doc(db, "users", userId);
+  await updateDoc(userRef, {
+    isOnline,
+    lastSeen: serverTimestamp(),
+  });
+};
+
+export const listenToUserStatus = (userId, callback) => {
+  const userRef = doc(db, "users", userId);
+  return onSnapshot(userRef, (docSnap) => {
+    const data = docSnap.data();
+    if (data) {
+      callback({
+        isOnline: data.isOnline,
+        lastSeen: data.lastSeen?.toDate(), // Convert Firestore timestamp to JS Date
+      });
+    }
   });
 };
