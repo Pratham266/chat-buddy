@@ -21,3 +21,9 @@
     transform-origin: center;
   }
 }
+
+.chat-editor {
+  .emoji-mart-bar {
+    display: none;
+  }
+}

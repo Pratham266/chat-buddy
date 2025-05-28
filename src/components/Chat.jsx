@@ -5,20 +5,18 @@ import {
   listenToMessages,
   listenToTypingStatus,
   listenToUserStatus,
-  sendMessage,
-  setTypingStatus,
 } from "../services/messageService";
 import Logout from "./Logout";
 import { formatLastSeen } from "../helper/dateTimeFormater";
 import { Icon } from "../IconsMap";
+import ChatEditor from "./Editor";
 
 // const widowInnerHeight = window.innerHeight;
 
 const Chat = ({ currentUser, otherUser }) => {
   const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState("");
   const [isOtherTyping, setIsOtherTyping] = useState(false);
-  const typingTimeout = useRef(null);
+
   const [status, setStatus] = useState({ isOnline: false, lastSeen: null });
 
   useEffect(() => {
@@ -61,29 +59,7 @@ const Chat = ({ currentUser, otherUser }) => {
       unsubscribeOtherUserStatus();
     };
   }, [currentUser, otherUser]);
-
-  const handleInputChange = async (e) => {
-    const value = e.target.value;
-    setInputMessage(value);
-
-    const chatId = await getOrCreateChatId(currentUser.code, otherUser.code);
-    setTypingStatus(chatId, currentUser.code, true);
-
-    clearTimeout(typingTimeout.current);
-    typingTimeout.current = setTimeout(() => {
-      setTypingStatus(chatId, currentUser.code, false);
-    }, 1000);
-  };
-
-  const handleSend = async () => {
-    if (inputMessage.trim() === "") return;
-
-    const chatId = await getOrCreateChatId(currentUser.code, otherUser.code);
-    await sendMessage(chatId, currentUser.code, otherUser.code, inputMessage);
-    setTypingStatus(chatId, currentUser.code, false);
-    setInputMessage("");
-  };
-
+  console.log({ currentUser, otherUser });
   return (
     // Header
     <div
@@ -137,22 +113,7 @@ const Chat = ({ currentUser, otherUser }) => {
         </div>
       </div>
 
-      <div className="bg-white p-4 flex items-center">
-        <input
-          type="text"
-          placeholder="Type your message..."
-          className="flex-1 border rounded-full px-4 py-2 focus:outline-none"
-          value={inputMessage}
-          onChange={handleInputChange}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        />
-        <button
-          className="bg-blue-500 text-white rounded-full p-2 ml-2 hover:bg-blue-600 focus:outline-none"
-          onClick={handleSend}
-        >
-          send message
-        </button>
-      </div>
+      <ChatEditor currentUser={currentUser} otherUser={otherUser} />
     </div>
   );
 };
