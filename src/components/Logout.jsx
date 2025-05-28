@@ -20,7 +20,16 @@ const Logout = () => {
       // nothing
     }
   };
-  return <button onClick={handleLogout}>Logout</button>;
+
+  return (
+    <button
+      id="logout"
+      className="hover:bg-blue-400 rounded-md p-1"
+      onClick={handleLogout}
+    >
+      Logout
+    </button>
+  );
 };
 
 export default Logout;

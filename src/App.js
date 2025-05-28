@@ -57,11 +57,9 @@ function App() {
 
   if (user)
     return (
-      <div className="p-4">
-        <Logout />
-        <h1 className="text-xl font-bold">Welcome, {user.username}</h1>
+      <>
         <Chat currentUser={user} otherUser={otherUser} />
-      </div>
+      </>
     );
   return (
     <div className="dotLoader-animation flex justify-center items-center min-h-screen">
