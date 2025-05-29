@@ -3,6 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../services/firebase";
 import { logout } from "../redux/reducer/userDetailsReducer";
 import { useDispatch } from "react-redux";
+import { Icon } from "../IconsMap";
 
 const Logout = () => {
   const dispatch = useDispatch();
@@ -23,11 +24,10 @@ const Logout = () => {
 
   return (
     <button
-      id="logout"
-      className="hover:bg-blue-400 rounded-md p-1"
+      className="p-2 rounded-lg border border-gray-600 hover:bg-gray-800"
       onClick={handleLogout}
     >
-      Logout
+      <Icon name={"logout"} size={20} />
     </button>
   );
 };

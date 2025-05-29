@@ -10,6 +10,8 @@ import Logout from "./Logout";
 import { formatLastSeen } from "../helper/dateTimeFormater";
 import { Icon } from "../IconsMap";
 import ChatEditor from "./Editor";
+import ChatHeader from "./ChatHeader";
+import Messages from "./Messages";
 
 // const widowInnerHeight = window.innerHeight;
 
@@ -61,60 +63,20 @@ const Chat = ({ currentUser, otherUser }) => {
   }, [currentUser, otherUser]);
   console.log({ currentUser, otherUser });
   return (
-    // Header
-    <div
-      className="bg-gray-100 h-screen flex flex-col max-w-lg mx-auto"
-      style={{ maxHeight: "100dvh" }}
-    >
-      <div className="bg-blue-500 p-4 text-white flex justify-between items-center">
-        <button id="login" className="hover:bg-blue-400 rounded-md p-1">
-          userProfile
-        </button>
-        <span>{otherUser.username}</span>
-        <div className="text-sm text-gray-500">
-          {status.isOnline ? "Online" : formatLastSeen(status.lastSeen)}
-        </div>
-        <div className="relative inline-block text-left">
-          <Logout />
-        </div>
+    <>
+      <div
+        class="flex flex-col h-screen bg-black text-white"
+        style={{ maxHeight: "100dvh" }}
+      >
+        <ChatHeader status={status} otherUser={otherUser} />
+        <Messages messages={messages} currentUser={currentUser} />
+        <ChatEditor
+          currentUser={currentUser}
+          otherUser={otherUser}
+          isOtherTyping={isOtherTyping}
+        />
       </div>
-
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="flex flex-col space-y-2">
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex ${
-                msg.senderId === currentUser.code ? "justify-end" : ""
-              }`}
-            >
-              <div
-                className={`text-black p-2 rounded-lg max-w-xs  break-all ${
-                  msg.senderId === currentUser.code
-                    ? "bg-blue-200"
-                    : "bg-gray-300"
-                }`}
-              >
-                {msg.text}
-              </div>
-              {msg.senderId === currentUser.code && (
-                <Icon
-                  name={`${msg.status === "S" ? "doubleTick" : "singleTick"}`}
-                  size={20}
-                />
-              )}
-            </div>
-          ))}
-          {isOtherTyping && (
-            <div className="italic text-sm text-gray-500">
-              {otherUser.code} is typing...
-            </div>
-          )}
-        </div>
-      </div>
-
-      <ChatEditor currentUser={currentUser} otherUser={otherUser} />
-    </div>
+    </>
   );
 };
 

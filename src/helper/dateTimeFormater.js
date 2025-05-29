@@ -26,3 +26,34 @@ export const formatLastSeen = (date) => {
     return `Last seen on ${dayName} at ${timeString}`;
   }
 };
+
+const formatDate = (timestamp) => {
+  const date = new Date(timestamp.seconds * 1000);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  if (date.toDateString() === today.toDateString()) {
+    return "Today";
+  } else if (date.toDateString() === yesterday.toDateString()) {
+    return "Yesterday";
+  } else {
+    // Format like 28 MAY 2025
+    return date
+      .toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+      .toUpperCase();
+  }
+};
+
+const formatTime = (timestamp) => {
+  const date = new Date(timestamp.seconds * 1000);
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};

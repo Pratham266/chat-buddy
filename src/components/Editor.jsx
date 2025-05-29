@@ -6,8 +6,9 @@ import {
   sendMessage,
   setTypingStatus,
 } from "../services/messageService";
+import { Icon } from "../IconsMap";
 
-const ChatEditor = ({ currentUser, otherUser }) => {
+const ChatEditor = ({ currentUser, otherUser, isOtherTyping }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const typingTimeout = useRef(null);
   const pickerRef = useRef(null);
@@ -50,38 +51,43 @@ const ChatEditor = ({ currentUser, otherUser }) => {
   };
 
   return (
-    <div className="bg-white p-4 flex items-center relative chat-editor">
-      <input
-        type="text"
-        placeholder="Type your message..."
-        className="flex-1 border rounded-full px-4 py-2 focus:outline-none"
-        value={inputMessage}
-        onChange={handleInputChange}
-        onKeyDown={(e) => e.key === "Enter" && handleSend()}
-      />
-
-      <button
-        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-        className="ml-2 text-xl"
-      >
-        😊
-      </button>
-
-      {showEmojiPicker && (
-        <div className="absolute bottom-16 right-4 z-50">
-          <div ref={pickerRef}>
-            <Picker onSelect={handleEmojiSelect} showPreview={false} />
+    <>
+      <footer class="bg-gray-900 px-4 py-3 border-t border-gray-700 flex items-center space-x-2 chat-editor">
+        {isOtherTyping && (
+          <div className="italic text-sm text-gray-500">
+            {otherUser.code} is typing...
           </div>
-        </div>
-      )}
+        )}
+        {showEmojiPicker && (
+          <div className="absolute bottom-16 z-50">
+            <div ref={pickerRef}>
+              <Picker onSelect={handleEmojiSelect} showPreview={false} />
+            </div>
+          </div>
+        )}
+        <button
+          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          className="ml-2 text-xl"
+        >
+          <Icon name="smile" size={20} />
+        </button>
+        <input
+          type="text"
+          placeholder="Type your message..."
+          class="flex-1 px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={inputMessage}
+          onChange={handleInputChange}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+        />
 
-      <button
-        className="bg-blue-500 text-white rounded-full p-2 ml-2 hover:bg-blue-600 focus:outline-none"
-        onClick={handleSend}
-      >
-        send
-      </button>
-    </div>
+        <button
+          class="bg-blue-600 text-white px-2 py-2 rounded-full hover:bg-blue-700"
+          onClick={handleSend}
+        >
+          <Icon name="send" size={20} />
+        </button>
+      </footer>
+    </>
   );
 };
 
