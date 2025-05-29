@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
-import "draft-js/dist/Draft.css";
 import {
   getOrCreateChatId,
   sendMessage,
