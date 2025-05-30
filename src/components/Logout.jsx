@@ -24,10 +24,10 @@ const Logout = () => {
 
   return (
     <button
-      className="p-2 rounded-lg border border-gray-600 hover:bg-gray-800"
+      className="p-2 rounded-lg border border-gray-300 hover:bg-[#e5d8f5]"
       onClick={handleLogout}
     >
-      <Icon name={"logout"} size={20} />
+      <Icon name={"logout"} size={15} color="#9333ea" />
     </button>
   );
 };

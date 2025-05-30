@@ -65,7 +65,7 @@ const Chat = ({ currentUser, otherUser }) => {
   return (
     <>
       <div
-        class="flex flex-col h-screen bg-black text-white"
+        class="flex flex-col h-screen text-white"
         style={{ maxHeight: "100dvh" }}
       >
         <ChatHeader status={status} otherUser={otherUser} />

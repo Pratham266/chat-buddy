@@ -52,12 +52,13 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping }) => {
 
   return (
     <>
-      <footer class="bg-gray-900 px-4 py-3 border-t border-gray-700 flex items-center space-x-2 chat-editor">
+      <footer className="bg-[#f3ecf9] px-4 py-3 border-t  rounded-4xl flex items-center space-x-2 chat-editor">
         {isOtherTyping && (
           <div className="italic text-sm text-gray-500">
             {otherUser.code} is typing...
           </div>
         )}
+
         {showEmojiPicker && (
           <div className="absolute bottom-16 z-50">
             <div ref={pickerRef}>
@@ -65,26 +66,28 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping }) => {
             </div>
           </div>
         )}
+
         <button
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="ml-2 text-xl"
+          className="bg-[#9333ea] text-white px-1 py-1 rounded-full hover:bg-[#7e22ce]"
         >
-          <Icon name="smile" size={20} />
+          <Icon name="smile" size={24} />
         </button>
+
         <input
           type="text"
           placeholder="Type your message..."
-          class="flex-1 px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-4 py-2 bg-white text-[#1f1f1f] border border-gray-300 rounded-full placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
           value={inputMessage}
           onChange={handleInputChange}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
         />
 
         <button
-          class="bg-blue-600 text-white px-2 py-2 rounded-full hover:bg-blue-700"
+          className="bg-[#9333ea] text-white px-1 py-1  rounded-full hover:bg-[#7e22ce]"
           onClick={handleSend}
         >
-          <Icon name="send" size={20} />
+          <Icon name="send" size={24} />
         </button>
       </footer>
     </>
