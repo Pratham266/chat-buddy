@@ -7,6 +7,7 @@ import { IoMdTrash } from "react-icons/io";
 import { FaSignalMessenger } from "react-icons/fa6";
 import { BiSend } from "react-icons/bi";
 import { BsEmojiSmileFill } from "react-icons/bs";
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 const IconsMap = {
   dotloader: BiLoaderCircle,
@@ -18,6 +19,7 @@ const IconsMap = {
   signal: FaSignalMessenger,
   send: BiSend,
   smile: BsEmojiSmileFill,
+  dots: HiOutlineDotsHorizontal,
 };
 
 export const Icon = ({ name, ...props }) => {

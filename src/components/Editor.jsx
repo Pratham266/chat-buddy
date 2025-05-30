@@ -52,17 +52,30 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping }) => {
 
   return (
     <>
-      <footer className="bg-[#f3ecf9] px-4 py-3 border-t  rounded-4xl flex items-center space-x-2 chat-editor">
-        {isOtherTyping && (
-          <div className="italic text-sm text-gray-500">
-            {otherUser.code} is typing...
-          </div>
-        )}
-
+      <footer className="bg-[#f3ecf9] px-4 py-3 border-t  rounded-4xl flex items-center space-x-2 chat-editor relative">
         {showEmojiPicker && (
           <div className="absolute bottom-16 z-50">
             <div ref={pickerRef}>
               <Picker onSelect={handleEmojiSelect} showPreview={false} />
+            </div>
+          </div>
+        )}
+
+        {isOtherTyping && (
+          <div className="absolute -top-[40px]   left-1/2 transform -translate-x-1/2 bg-gray-700 text-white px-6 py-2 rounded-full flex items-center space-x-2 shadow-md">
+            <div className="flex space-x-1">
+              <span
+                className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
+                style={{ animationDelay: "0s" }}
+              ></span>
+              <span
+                className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
+                style={{ animationDelay: "0.2s" }}
+              ></span>
+              <span
+                className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
+                style={{ animationDelay: "0.4s" }}
+              ></span>
             </div>
           </div>
         )}
