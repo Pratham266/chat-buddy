@@ -33,7 +33,13 @@ export const getOrCreateChatId = async (user1, user2) => {
   return chatId;
 };
 
-export const sendMessage = async (chatId, senderId, receiverId, text) => {
+export const sendMessage = async (
+  chatId,
+  senderId,
+  receiverId,
+  text = "",
+  mediaUrl = ""
+) => {
   const messageRef = collection(db, "chats", chatId, "messages");
 
   await addDoc(messageRef, {
@@ -42,12 +48,14 @@ export const sendMessage = async (chatId, senderId, receiverId, text) => {
     text,
     timestamp: serverTimestamp(),
     status: "P",
+    mediaUrl,
   });
 
   // Update parent chat doc with last message
   const chatRef = doc(db, "chats", chatId);
   await updateDoc(chatRef, {
     lastMessage: text,
+    lastMedia: mediaUrl,
     lastUpdated: serverTimestamp(),
   });
 };

@@ -32,7 +32,7 @@ const Logout = ({ updateShowTheLoginScreen }) => {
 
   return (
     <button
-      className="p-2 rounded-lg border border-gray-300 hover:bg-[#e5d8f5]"
+      className="cursor-pointer p-2 rounded-lg border border-gray-300 hover:bg-[#e5d8f5]"
       onClick={handleLogout}
     >
       <Icon name={"logout"} size={15} color="#9333ea" />

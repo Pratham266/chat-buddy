@@ -7,13 +7,19 @@ import {
   setTypingStatus,
 } from "../services/messageService";
 import { Icon } from "../IconsMap";
+import Modal from "./Modal";
+import { Img } from "react-image";
+import ImageLoader from "./ImageLoader";
 
-const ChatEditor = ({ currentUser, otherUser, isOtherTyping }) => {
+const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const typingTimeout = useRef(null);
   const pickerRef = useRef(null);
   const [inputMessage, setInputMessage] = useState("");
-
+  const [mediaUrl, setMediaUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUploadMendiaError, setIsUploadMendiaError] = useState(false);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (pickerRef.current && !pickerRef.current.contains(event.target)) {
@@ -25,11 +31,55 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "chat_buddy"); // your unsigned preset
+    formData.append("folder", "chat_images");
+
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+
+    if (data?.error) {
+      setIsUploadMendiaError(data?.error?.message);
+      return;
+    }
+    return data?.secure_url; // This is the image URL to store in Firestore
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    setIsUploadMendiaError(false);
+    if (file) {
+      setUploading(true);
+      setIsModalOpen(true);
+      const imgUrl = await uploadToCloudinary(file);
+      setMediaUrl(imgUrl);
+      setUploading(false);
+    }
+  };
+
   const handleSend = async () => {
-    if (inputMessage.trim() === "") return;
-    const chatId = await getOrCreateChatId(currentUser.code, otherUser.code);
+    if (inputMessage.trim() === "" && mediaUrl.trim() === "") return;
+    // const chatId = await getOrCreateChatId(currentUser.code, otherUser.code);
+
+    await sendMessage(
+      chatId,
+      currentUser.code,
+      otherUser.code,
+      inputMessage,
+      mediaUrl
+    );
     setInputMessage("");
-    await sendMessage(chatId, currentUser.code, otherUser.code, inputMessage);
+    setIsModalOpen(false);
+    setMediaUrl(null);
     setTypingStatus(chatId, currentUser.code, false);
   };
 
@@ -37,7 +87,7 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping }) => {
     const value = e.target.value;
     setInputMessage(value);
 
-    const chatId = await getOrCreateChatId(currentUser.code, otherUser.code);
+    // const chatId = await getOrCreateChatId(currentUser.code, otherUser.code);
     setTypingStatus(chatId, currentUser.code, true);
 
     clearTimeout(typingTimeout.current);
@@ -48,6 +98,10 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping }) => {
 
   const handleEmojiSelect = (emoji) => {
     setInputMessage((prev) => `${prev}${emoji.native}`);
+  };
+
+  const handleOpenModal = (val) => {
+    setIsModalOpen(val);
   };
 
   return (
@@ -80,13 +134,29 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping }) => {
           </div>
         )}
 
-        <button
-          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="bg-[#9333ea] text-white px-1 py-1 rounded-full hover:bg-[#7e22ce]"
-        >
-          <Icon name="smile" size={24} />
-        </button>
+        <div className="flex item-center justify-center">
+          <button
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className="cursor-pointer bg-[#9333ea] text-white px-0.5 py-0.5 rounded-full hover:bg-[#7e22ce] mr-2"
+          >
+            <Icon name="smile" size={20} />
+          </button>
 
+          <input
+            type="file"
+            id="file-upload"
+            className="hidden"
+            onChange={handleFileChange}
+            accept="image/*"
+          />
+
+          <label
+            htmlFor="file-upload"
+            className=" cursor-pointer cursor-pointer bg-[#9333ea] text-white px-0.5 py-0.5 rounded-full hover:bg-[#7e22ce] inline-flex items-center justify-center"
+          >
+            <Icon name="upload" size={20} />
+          </label>
+        </div>
         <input
           type="text"
           placeholder="Type your message..."
@@ -97,12 +167,52 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping }) => {
         />
 
         <button
-          className="bg-[#9333ea] text-white px-1 py-1  rounded-full hover:bg-[#7e22ce]"
+          className="cursor-pointer bg-[#9333ea] text-white px-1 py-1  rounded-full hover:bg-[#7e22ce]"
           onClick={handleSend}
         >
           <Icon name="send" size={24} />
         </button>
       </footer>
+      {isModalOpen && (
+        <Modal
+          open={isModalOpen}
+          handleOpen={handleOpenModal}
+          saveText="Done"
+          cancleText="Cancle"
+          onModalClose={handleOpenModal}
+          onModalCalcle={handleOpenModal}
+          onSave={handleSend}
+          title={"Send Image"}
+        >
+          <div className="w-full relative h-auto p-1 border border-gray-200 rounded-md max-w-sm mx-auto flex items-center justify-center bg-[#2d143e]">
+            {uploading ? (
+              <div className="dotLoader-animation">
+                <Icon name="dotloader" size={100} color={"#f7b0fb"} />
+              </div>
+            ) : (
+              <>
+                {isUploadMendiaError && (
+                  <div className="text-red-900 bg-[#f4ecf9] p-1 rounded max-h-[300px] overflow-y-auto">
+                    <p className="font-bold">
+                      Sorry We Note Able To Upload An Image
+                    </p>
+                    <span text="font-bold">Reason: </span>
+                    <span className="text-sm italic">
+                      {isUploadMendiaError}
+                    </span>
+                  </div>
+                )}
+                <Img
+                  src={mediaUrl}
+                  alt="uploadImage"
+                  className="rounded-md max-w-full h-auto"
+                  loader={<ImageLoader />}
+                />
+              </>
+            )}
+          </div>
+        </Modal>
+      )}
     </>
   );
 };

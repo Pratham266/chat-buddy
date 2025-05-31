@@ -40,22 +40,18 @@ const Login = () => {
     }
   }, [userError]);
 
-  const plc = { 0: "O", 1: "T", 2: "P" };
-
   return (
     <>
-      <div
-        className="relative flex  flex-col justify-center overflow-hidden bg-black py-12"
-        style={{ maxHeight: "100dvh" }}
-      >
-        <div className="relative bg-white px-6 pt-10 pb-9 shadow-xl mx-auto w-full max-w-lg rounded-2xl">
+      <div className="relative flex  flex-col justify-center overflow-hidden  py-12 h-dvh">
+        <div className="relative px-6 pt-10 pb-9 shadow-xl mx-auto w-full max-w-lg rounded-2xl bg-[#dfc3ff]">
           <div className="mx-auto flex w-full max-w-md flex-col space-y-4">
             <div className="flex flex-col items-center justify-center text-center space-y-2">
+              <Icon name="game" size={50} />
               <div className="font-semibold text-3xl">
-                <p>Email Verification</p>
+                <p>RealmRunners</p>
               </div>
-              <div className="flex flex-row text-sm font-medium text-gray-400">
-                <p>Enter Username Symbol OTP </p>
+              <div className="flex flex-row text-sm font-medium text-black-400">
+                <p>Only the brave survive the run.</p>
               </div>
             </div>
 
@@ -66,22 +62,26 @@ const Login = () => {
               <div className="flex flex-col space-y-4">
                 {/* Username Input */}
                 <input
-                  className="w-full h-[50px] text-center px-5 outline-none rounded-xl border border-gray-200 text-lg bg-white focus:bg-gray-50 focus:ring-1 ring-blue-700"
+                  className="w-full h-[50px] text-center px-5 outline-none rounded-xl border border-[#5f317e] text-lg bg-white focus:bg-gray-50 focus:ring-1 ring-[#5f317e]"
                   type="text"
-                  placeholder="Enter username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
                 />
 
                 {/* Symbol Input */}
                 <div className="flex justify-center">
                   <input
-                    className="w-16 h-16 text-center px-5 outline-none rounded-xl border border-gray-200 text-lg bg-white focus:bg-gray-50 focus:ring-1 ring-blue-700"
+                    className="w-16 h-16 text-center px-5 outline-none rounded-xl border border-[#5f317e] text-lg bg-white focus:bg-gray-50 focus:ring-1 ring-[#5f317e]"
                     type="text"
                     maxLength={1}
                     value={symbol}
-                    placeholder="S"
                     onChange={(e) => setSymbol(e.target.value)}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    spellCheck={false}
                   />
                 </div>
 
@@ -90,12 +90,14 @@ const Login = () => {
                   {otp.map((digit, idx) => (
                     <input
                       key={idx}
-                      className="w-16 h-16 text-center px-5 outline-none rounded-xl border border-gray-200 text-lg bg-white focus:bg-gray-50 focus:ring-1 ring-blue-700"
+                      className="w-16 h-16 text-center px-5 outline-none rounded-xl border border-[#5f317e] text-lg bg-white focus:bg-gray-50 focus:ring-1 ring-[#5f317e]"
                       type="text"
                       maxLength={1}
                       value={digit}
                       onChange={(e) => handleOtpChange(e.target.value, idx)}
-                      placeholder={plc[idx]}
+                      autoComplete="off"
+                      autoCorrect="off"
+                      spellCheck={false}
                     />
                   ))}
                 </div>
@@ -103,14 +105,16 @@ const Login = () => {
                 {/* Verify Button */}
                 <button
                   type="submit"
-                  className="w-full py-5 bg-blue-700 text-white rounded-xl text-sm shadow-sm"
+                  className="w-full py-5 bg-[#2d143e] cursor-pointer  hover:bg-[#5f317e] text-white rounded-xl text-sm shadow-sm"
                 >
                   {userStatus === "pending" ? (
                     <div className="dotLoader-animation item-center justify-center flex flex-center">
                       <Icon name="dotloader" size={20} />
                     </div>
                   ) : (
-                    <span> Verify Account</span>
+                    <div className="item-center justify-center flex flex-center">
+                      <Icon name="car" size={20} />
+                    </div>
                   )}
                 </button>
               </div>

@@ -75,7 +75,7 @@ const Chat = ({ currentUser, otherUser, updateShowTheLoginScreen }) => {
   return (
     <>
       <div
-        class="flex flex-col h-screen text-white bg-[#2d143e]"
+        className="flex flex-col h-screen text-white bg-[#2d143e]"
         style={{ maxHeight: "100dvh" }}
       >
         <ChatHeader
@@ -91,6 +91,7 @@ const Chat = ({ currentUser, otherUser, updateShowTheLoginScreen }) => {
           currentUser={currentUser}
           otherUser={otherUser}
           isOtherTyping={isOtherTyping}
+          chatId={chatId}
         />
       </div>
     </>

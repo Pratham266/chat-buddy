@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 import { Icon } from "../IconsMap";
+import { Img } from "react-image";
+import ImageLoader from "./ImageLoader";
 
 const Messages = ({ messages, currentUser }) => {
   // Sort messages by timestamp ascending (optional if already sorted)
@@ -49,7 +51,7 @@ const Messages = ({ messages, currentUser }) => {
 
   let lastDate = null;
   // let lastSender = null;
-
+  console.log({ sortedMessages });
   return (
     <main
       className="flex-1 overflow-y-auto px-4 py-3 "
@@ -65,13 +67,16 @@ const Messages = ({ messages, currentUser }) => {
         const showProfileIcon =
           index === messages.length - 1 ||
           messages[index + 1].senderId !== msg.senderId;
+        const { text, mediaUrl, senderId, timestamp, status } = msg;
+        const downloadUrl =
+          mediaUrl && mediaUrl.replace("/upload/", "/upload/fl_attachment/");
         return (
           <React.Fragment key={msg.id}>
             {/* Date Separator */}
             {showDateSeparator && (
               <>
                 <div className="flex justify-center py-2">
-                  <span class="bg-gray-200 text-gray-700 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-sm ">
+                  <span className="bg-gray-200 text-gray-700 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-sm ">
                     {msgDate}
                   </span>
                 </div>
@@ -87,11 +92,39 @@ const Messages = ({ messages, currentUser }) => {
               {isOwnerMessage ? (
                 <div className="flex flex-col items-end space-y-1">
                   <div className="relative bg-[#dfc3ff] p-3 rounded-xl rounded-br-none text-sm max-w-xs text-[#1f1f1f]">
-                    <div className="pr-10">{msg.text}</div>
+                    {mediaUrl && (
+                      <>
+                        <div className="mb-1 ">
+                          <a
+                            href={downloadUrl}
+                            download // ✅ tell browser to download it
+                            target="blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            <Icon name="download" size={20} color={"#2d143e"} />
+                          </a>
+                        </div>
+                        <Img
+                          className="w-60 h-60 rounded-sm"
+                          src={mediaUrl}
+                          loader={<ImageLoader />}
+                          alt={`chat-imag-${senderId}-${index}`}
+                        />
+                      </>
+                    )}
+                    {text && (
+                      <div className={`pr-10 ${mediaUrl ? "mt-2" : ""}`}>
+                        {text}
+                      </div>
+                    )}
+
                     <div className="absolute bottom-0 right-1 flex items-center space-x-1 text-[8px] text-gray-800">
-                      <span>{formatTime(msg.timestamp)}</span>
+                      <span>{formatTime(timestamp)}</span>
                       <Icon
-                        name={msg.status === "S" ? "doubleTick" : "singleTick"}
+                        name={status === "S" ? "doubleTick" : "singleTick"}
                         size={15}
                         color={"b20ffd"}
                       />
@@ -108,9 +141,34 @@ const Messages = ({ messages, currentUser }) => {
                   <div
                     className={`relative bg-[#f7b0fb] p-3 rounded-xl rounded-tl-none text-sm max-w-xs text-[#1f1f1f] `}
                   >
-                    <div className="pr-10">{msg.text}</div>
+                    {mediaUrl && (
+                      <>
+                        <div className="mb-1">
+                          <a
+                            href={downloadUrl}
+                            download // ✅ tell browser to download it
+                            target="blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            <Icon name="download" size={20} color={"#2d143e"} />
+                          </a>
+                        </div>
+                        <Img
+                          className="w-60 h-60 rounded-sm"
+                          src={mediaUrl}
+                          loader={<ImageLoader />}
+                          alt={`chat-imag-${senderId}-${index}`}
+                        />
+                      </>
+                    )}
+                    <div className={`pr-10 ${mediaUrl ? "mt-2" : ""}`}>
+                      {text}
+                    </div>
                     <div className="absolute bottom-0 right-2 text-[8px] text-gray-800">
-                      {formatTime(msg.timestamp)}
+                      {formatTime(timestamp)}
                     </div>
                   </div>
                 </div>

@@ -1,3 +1,5 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap"); */
+
 @keyframes rotate {
   0% {
     transform: rotate(0deg);
@@ -21,7 +23,7 @@
 
 .dotLoader-animation {
   svg {
-    animation: rotate 1s linear infinite;
+    animation: rotate 3s linear infinite;
     transform-origin: center;
   }
 }
