@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Picker } from "emoji-mart";
-import "emoji-mart/css/emoji-mart.css";
+import EmojiPicker from "emoji-picker-react";
 import {
   getOrCreateChatId,
   sendMessage,
@@ -97,7 +96,7 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
   };
 
   const handleEmojiSelect = (emoji) => {
-    setInputMessage((prev) => `${prev}${emoji.native}`);
+    setInputMessage((prev) => `${prev}${emoji.emoji}`);
   };
 
   const handleOpenModal = (val) => {
@@ -110,7 +109,11 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
         {showEmojiPicker && (
           <div className="absolute bottom-16 z-50">
             <div ref={pickerRef}>
-              <Picker onSelect={handleEmojiSelect} showPreview={false} />
+              <EmojiPicker
+                onEmojiClick={handleEmojiSelect}
+                showPreview={false}
+                theme="dark"
+              />
             </div>
           </div>
         )}
