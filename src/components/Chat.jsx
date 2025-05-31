@@ -6,31 +6,34 @@ import {
   listenToTypingStatus,
   listenToUserStatus,
 } from "../services/messageService";
-import Logout from "./Logout";
-import { formatLastSeen } from "../helper/dateTimeFormater";
-import { Icon } from "../IconsMap";
 import ChatEditor from "./Editor";
 import ChatHeader from "./ChatHeader";
 import Messages from "./Messages";
+import { listenToDangerFlag } from "../services/privacyService";
 
 // const widowInnerHeight = window.innerHeight;
 
-const Chat = ({ currentUser, otherUser }) => {
+const Chat = ({ currentUser, otherUser, updateShowTheLoginScreen }) => {
   const [messages, setMessages] = useState([]);
   const [isOtherTyping, setIsOtherTyping] = useState(false);
-
+  const [chatId, setChatId] = useState(null);
   const [status, setStatus] = useState({ isOnline: false, lastSeen: null });
+  const [isDanger, setIsDanger] = useState(false);
 
   useEffect(() => {
     let unsubscribeMessages = () => {};
     let unsubscribeTyping = () => {};
     let unsubscribeOtherUserStatus = () => {};
+    let unSubscribePrivacyButton = () => {};
 
     const initChat = async () => {
-      const chatId = await getOrCreateChatId(currentUser.code, otherUser.code);
-
+      const userChatId = await getOrCreateChatId(
+        currentUser.code,
+        otherUser.code
+      );
+      setChatId(userChatId);
       unsubscribeMessages = listenToMessages(
-        chatId,
+        userChatId,
         currentUser.code,
         (msgs) => {
           setMessages(msgs);
@@ -38,7 +41,7 @@ const Chat = ({ currentUser, otherUser }) => {
       );
 
       unsubscribeTyping = listenToTypingStatus(
-        chatId,
+        userChatId,
         otherUser.code,
         (isTyping) => {
           setIsOtherTyping(isTyping);
@@ -49,6 +52,8 @@ const Chat = ({ currentUser, otherUser }) => {
         otherUser.userId,
         setStatus
       );
+
+      unSubscribePrivacyButton = listenToDangerFlag(userChatId, setIsDanger);
     };
 
     if (currentUser && otherUser) {
@@ -59,16 +64,28 @@ const Chat = ({ currentUser, otherUser }) => {
       unsubscribeMessages();
       unsubscribeTyping();
       unsubscribeOtherUserStatus();
+      unSubscribePrivacyButton();
     };
   }, [currentUser, otherUser]);
-  console.log({ currentUser, otherUser });
+
+  const handleMessagesState = (messages) => {
+    setMessages(messages);
+  };
+
   return (
     <>
       <div
-        class="flex flex-col h-screen text-white"
+        class="flex flex-col h-screen text-white bg-[#2d143e]"
         style={{ maxHeight: "100dvh" }}
       >
-        <ChatHeader status={status} otherUser={otherUser} />
+        <ChatHeader
+          status={status}
+          otherUser={otherUser}
+          updateShowTheLoginScreen={updateShowTheLoginScreen}
+          handleMessagesState={handleMessagesState}
+          chatId={chatId}
+          isDanger={isDanger}
+        />
         <Messages messages={messages} currentUser={currentUser} />
         <ChatEditor
           currentUser={currentUser}

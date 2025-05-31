@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Login from "./components/Login";
 
 import { onAuthStateChanged } from "firebase/auth";
@@ -9,6 +9,8 @@ import { decryptData, encryptData } from "./helper/encodeDecode";
 import { Icon } from "./IconsMap";
 import Chat from "./components/Chat";
 import { updateOnlineStatus } from "./services/messageService";
+import { logout } from "./redux/reducer/userDetailsReducer";
+import { logutUserFromFirbaseAndLocalStorage } from "./components/Logout";
 
 function App() {
   const {
@@ -16,8 +18,12 @@ function App() {
     chatUser,
     status: userStatus,
   } = useSelector((state) => state.userDetails);
-
+  const [showLoginScreen, setShowLoginScreen] = useState(false);
   const dispatch = useDispatch();
+  const logoutUser = () => {
+    dispatch(logout()); // this will clear user from the store
+  };
+
   const savedCode = localStorage.getItem("token_code");
   const tokenCode = decryptData(savedCode);
 
@@ -30,20 +36,32 @@ function App() {
     }
   };
 
+  const handleVisibilityChange = async () => {
+    if (document.visibilityState === "hidden") {
+      if (user && user.code) updateOnlineStatus(user.userId, false);
+      // setShowLoginScreen(true);
+      // logoutUser();
+      // await logutUserFromFirbaseAndLocalStorage();
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       userLoggedInOrNot(user);
     });
-
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     // Cleanup when component unmounts
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   useEffect(() => {
     if (userStatus === "succeeded" && user) {
       const tokenCode = encryptData(user.code);
       localStorage.setItem("token_code", tokenCode);
-
+      setShowLoginScreen(false);
       updateOnlineStatus(user.userId, true);
     }
 
@@ -63,17 +81,25 @@ function App() {
     dispatch(loginUser(code));
   };
 
-  if (!user && !tokenCode) return <Login />;
+  const updateShowTheLoginScreen = (value) => {
+    setShowLoginScreen(value);
+  };
+
+  if ((!user && !tokenCode) || showLoginScreen) return <Login />;
 
   if (user)
     return (
       <>
-        <Chat currentUser={user} otherUser={chatUser} />
+        <Chat
+          currentUser={user}
+          otherUser={chatUser}
+          updateShowTheLoginScreen={updateShowTheLoginScreen}
+        />
       </>
     );
   return (
-    <div className="dotLoader-animation flex justify-center items-center min-h-screen">
-      <Icon name="screenLoader" size={40} />
+    <div className="dotLoader-animation flex justify-center items-center min-h-screen bg-[#2d143e]">
+      <Icon name="screenLoader" size={40} color="white" />
     </div>
   );
 }

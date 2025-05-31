@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -10,7 +11,6 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
-  where,
   writeBatch,
 } from "firebase/firestore";
 import { db } from "./firebase";
@@ -122,4 +122,20 @@ export const listenToUserStatus = (userId, callback) => {
       });
     }
   });
+};
+
+export const deleteAllMessages = async (chatId) => {
+  const messagesRef = collection(db, "chats", chatId, "messages");
+
+  const snapshot = await getDocs(messagesRef);
+
+  const deletePromises = snapshot.docs.map((docSnap) =>
+    deleteDoc(doc(db, "chats", chatId, "messages", docSnap.id))
+  );
+
+  await Promise.all(deletePromises);
+  return {
+    message: `All messages deleted for chatId: ${chatId}`,
+    success: true,
+  };
 };

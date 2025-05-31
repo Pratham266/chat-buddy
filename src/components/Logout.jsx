@@ -5,18 +5,26 @@ import { logout } from "../redux/reducer/userDetailsReducer";
 import { useDispatch } from "react-redux";
 import { Icon } from "../IconsMap";
 
-const Logout = () => {
-  const dispatch = useDispatch();
+export const logutUserFromFirbaseAndLocalStorage = async () => {
+  try {
+    await signOut(auth);
+    localStorage.removeItem("token_code");
+  } catch (error) {
+    // nothing
+  }
+};
 
+const Logout = ({ updateShowTheLoginScreen }) => {
+  const dispatch = useDispatch();
   const logoutUser = () => {
     dispatch(logout()); // this will clear user from the store
   };
 
   const handleLogout = async () => {
     try {
-      await signOut(auth); // this logs the user out from Firebase
-      localStorage.removeItem("token_code");
+      updateShowTheLoginScreen(true);
       logoutUser();
+      await logutUserFromFirbaseAndLocalStorage();
     } catch (error) {
       // nothing
     }

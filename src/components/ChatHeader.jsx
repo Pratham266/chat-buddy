@@ -2,10 +2,28 @@ import React from "react";
 import { formatLastSeen } from "../helper/dateTimeFormater";
 import { Icon } from "../IconsMap";
 import Logout from "./Logout";
+import { deleteAllMessages } from "../services/messageService";
+import { setDangerFlag } from "../services/privacyService";
 
-const ChatHeader = ({ status, otherUser }) => {
+const ChatHeader = ({
+  status,
+  otherUser,
+  updateShowTheLoginScreen,
+  handleMessagesState,
+  chatId,
+  isDanger,
+}) => {
+  const deleteMessages = async () => {
+    handleMessagesState([]);
+    await deleteAllMessages(chatId);
+  };
+
+  const handlePrivacyButtonClick = async () => {
+    await setDangerFlag(chatId, !isDanger);
+  };
+
   return (
-    <header className="bg-[#f3ecf9] px-3 py-1  flex items-center justify-between rounded-4xl">
+    <header className="bg-[#f3ecf9] px-3 py-1  flex items-center justify-between">
       <div className="flex items-center space-x-2">
         <img
           className="w-10 h-10 rounded-full"
@@ -23,13 +41,19 @@ const ChatHeader = ({ status, otherUser }) => {
       </div>
 
       <div className="flex items-center space-x-2">
-        <button className="p-2 rounded-lg border border-gray-300 hover:bg-[#e5d8f5]">
-          <Icon name={"signal"} size={15} color="red" />
+        <button
+          className="p-2 rounded-lg border border-gray-300 hover:bg-[#e5d8f5]"
+          onClick={handlePrivacyButtonClick}
+        >
+          <Icon name={"signal"} size={15} color={isDanger ? "red" : "green"} />
         </button>
-        <button className="p-2 rounded-lg border border-gray-300 hover:bg-[#e5d8f5]">
+        <button
+          className="p-2 rounded-lg border border-gray-300 hover:bg-[#e5d8f5]"
+          onClick={deleteMessages}
+        >
           <Icon name={"delete"} size={15} color="#9333ea" />
         </button>
-        <Logout />
+        <Logout updateShowTheLoginScreen={updateShowTheLoginScreen} />
       </div>
     </header>
   );

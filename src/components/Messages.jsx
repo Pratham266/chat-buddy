@@ -1,53 +1,19 @@
-// import React from "react";
-// import { Icon } from "../IconsMap";
-
-// const Messages = ({ messages, currentUser }) => {
-//   console.log({ messages });
-//   return (
-//     <main className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
-//       {messages.map((msg) => {
-//         const isOwnerMessage = msg.senderId === currentUser.code;
-//         return (
-//           <div
-//             key={msg.id}
-//             className={`flex ${
-//               isOwnerMessage ? "justify-end" : "items-start space-x-2"
-//             }`}
-//           >
-//             {isOwnerMessage ? (
-//               <div className="flex flex-col items-end space-y-1">
-//                 <div className="bg-blue-600 p-3 rounded-lg text-sm max-w-xs text-white">
-//                   {msg.text}
-//                 </div>
-//                 <Icon
-//                   name={msg.status === "S" ? "doubleTick" : "singleTick"}
-//                   size={20}
-//                 />
-//               </div>
-//             ) : (
-//               <>
-//                 <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-//                   A
-//                 </div>
-//                 <div className="bg-gray-800 p-3 rounded-lg text-sm max-w-xs">
-//                   {msg.text}
-//                 </div>
-//               </>
-//             )}
-//           </div>
-//         );
-//       })}
-//     </main>
-//   );
-// };
-
-// export default Messages;
-
-import React from "react";
+import React, { useEffect } from "react";
 import { Icon } from "../IconsMap";
 
 const Messages = ({ messages, currentUser }) => {
   // Sort messages by timestamp ascending (optional if already sorted)
+
+  useEffect(() => {
+    const container = document.getElementById("message-scroll-container");
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages && messages.length]);
+
   const sortedMessages = messages;
 
   // Helper functions
@@ -82,10 +48,13 @@ const Messages = ({ messages, currentUser }) => {
   };
 
   let lastDate = null;
-  let lastSender = null;
+  // let lastSender = null;
 
   return (
-    <main className="flex-1 overflow-y-auto px-4 py-3 bg-white">
+    <main
+      className="flex-1 overflow-y-auto px-4 py-3 "
+      id="message-scroll-container"
+    >
       {sortedMessages.map((msg, index) => {
         const isOwnerMessage = msg.senderId === currentUser.code;
 
@@ -93,12 +62,6 @@ const Messages = ({ messages, currentUser }) => {
         const showDateSeparator = msgDate !== lastDate;
         lastDate = msgDate;
 
-        const senderChanged = lastSender !== msg.senderId;
-        lastSender = msg.senderId;
-
-        // spacing between messages based on sender change
-        // 8px if sender changed, else 4px
-        const marginBottom = senderChanged ? "mb-4" : "mb-2";
         const showProfileIcon =
           index === messages.length - 1 ||
           messages[index + 1].senderId !== msg.senderId;
@@ -119,20 +82,18 @@ const Messages = ({ messages, currentUser }) => {
             <div
               className={`flex ${
                 isOwnerMessage ? "justify-end" : "items-start space-x-2"
-              } ${marginBottom}`}
+              } ${"mb-2"}`}
             >
               {isOwnerMessage ? (
                 <div className="flex flex-col items-end space-y-1">
-                  <div className="relative bg-[#c9a4f5] p-3 rounded-lg text-sm max-w-xs text-[#1f1f1f]">
+                  <div className="relative bg-[#dfc3ff] p-3 rounded-xl rounded-br-none text-sm max-w-xs text-[#1f1f1f]">
                     <div className="pr-10">{msg.text}</div>
-                    <div className="absolute bottom-0 right-2 text-[10px] text-gray-800">
-                      {formatTime(msg.timestamp)}
-                    </div>
-                    <div className="absolute -bottom-2 -right-2">
+                    <div className="absolute bottom-0 right-1 flex items-center space-x-1 text-[8px] text-gray-800">
+                      <span>{formatTime(msg.timestamp)}</span>
                       <Icon
                         name={msg.status === "S" ? "doubleTick" : "singleTick"}
                         size={15}
-                        color={msg.status === "S" ? "green" : "red"}
+                        color={"b20ffd"}
                       />
                     </div>
                   </div>
@@ -145,10 +106,10 @@ const Messages = ({ messages, currentUser }) => {
                     </div>
                   )} */}
                   <div
-                    className={`relative bg-[#f3ecf9] p-3 rounded-lg text-sm max-w-xs text-[#1f1f1f] `}
+                    className={`relative bg-[#f7b0fb] p-3 rounded-xl rounded-tl-none text-sm max-w-xs text-[#1f1f1f] `}
                   >
                     <div className="pr-10">{msg.text}</div>
-                    <div className="absolute bottom-0 right-2 text-[10px] text-gray-800">
+                    <div className="absolute bottom-0 right-2 text-[8px] text-gray-800">
                       {formatTime(msg.timestamp)}
                     </div>
                   </div>
