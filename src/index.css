@@ -9,6 +9,16 @@
   }
 }
 
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+.blink {
+  animation: blinker 1.5s linear infinite;
+}
+
 #root {
   background-color: #2d143e;
 }
@@ -32,4 +42,9 @@
   .epr_q53mwh.epr_vl50xg.epr_-3yva2a.epr_c90x4z.epr_-sisw4f.epr_mw4zr1.epr_-kg0voo.epr_iogimd.epr_wtwvf4.epr_-lzq3oa {
     display: none;
   }
+}
+
+.call-gradient {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  height: 90dvh;
 }

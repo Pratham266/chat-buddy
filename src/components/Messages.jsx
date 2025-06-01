@@ -51,7 +51,7 @@ const Messages = ({ messages, currentUser }) => {
 
   let lastDate = null;
   // let lastSender = null;
-  console.log({ sortedMessages });
+
   return (
     <main
       className="flex-1 overflow-y-auto px-4 py-3 "

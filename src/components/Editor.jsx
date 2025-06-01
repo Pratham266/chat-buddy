@@ -186,6 +186,7 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
           onModalCalcle={handleOpenModal}
           onSave={handleSend}
           title={"Send Image"}
+          bsClass={"top-30"}
         >
           <div className="w-full relative h-auto p-1 border border-gray-200 rounded-md max-w-sm mx-auto flex items-center justify-center bg-[#2d143e]">
             {uploading ? (

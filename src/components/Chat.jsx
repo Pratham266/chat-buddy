@@ -85,6 +85,7 @@ const Chat = ({ currentUser, otherUser, updateShowTheLoginScreen }) => {
           handleMessagesState={handleMessagesState}
           chatId={chatId}
           isDanger={isDanger}
+          currentUser={currentUser}
         />
         <Messages messages={messages} currentUser={currentUser} />
         <ChatEditor

@@ -13,6 +13,10 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import { FaCloudDownloadAlt } from "react-icons/fa";
 import { IoGameControllerOutline } from "react-icons/io5";
 import { FaCarAlt } from "react-icons/fa";
+import { BiSolidPhoneCall } from "react-icons/bi";
+import { ImPhoneHangUp } from "react-icons/im";
+import { MdVideoCall } from "react-icons/md";
+import { GoDotFill } from "react-icons/go";
 
 const IconsMap = {
   dotloader: BiLoaderCircle,
@@ -30,6 +34,10 @@ const IconsMap = {
   download: FaCloudDownloadAlt,
   game: IoGameControllerOutline,
   car: FaCarAlt,
+  calling: BiSolidPhoneCall,
+  hangup: ImPhoneHangUp,
+  videocall: MdVideoCall,
+  dot: GoDotFill,
 };
 
 export const Icon = ({ name, ...props }) => {
