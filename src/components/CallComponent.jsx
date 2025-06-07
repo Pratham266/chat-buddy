@@ -23,7 +23,8 @@ const CallComponent = ({ currentUser, otherUser }) => {
   const [isCallStarted, setIsCallStarted] = useState(false);
   const [isCallAccepted, setIsCallAccepted] = useState(false);
   const pcRef = useRef(null);
-  const callDocId = sortUserIdString(`${currentUserId}${otherUserId}`);
+  const callDocInputString = `${currentUser?.userId}${otherUser?.userId}`;
+  const callDocId = sortUserIdString(callDocInputString);
   const localVideoRef = useRef();
   const remoteVideoRef = useRef();
 
