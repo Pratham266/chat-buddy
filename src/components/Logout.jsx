@@ -22,9 +22,9 @@ const Logout = ({ updateShowTheLoginScreen }) => {
 
   const handleLogout = async () => {
     try {
-      updateShowTheLoginScreen(true);
       logoutUser();
       await logutUserFromFirbaseAndLocalStorage();
+      updateShowTheLoginScreen(true);
     } catch (error) {
       // nothing
     }

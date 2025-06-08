@@ -33,6 +33,8 @@ const userDetailsReducer = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+        state.chatUser = null;
+        state.user = null;
       });
   },
 });
