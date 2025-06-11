@@ -202,13 +202,13 @@ const CallComponent = ({ currentUser, otherUser }) => {
   return (
     <>
       <button
-        className=" cursor-pointer p-1.5 rounded-lg border border-[#9333ea] hover:bg-[#e5d8f5]"
+        className="p-2 rounded-full bg-purple-600 text-white hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 transition-all duration-200 cursor-pointer"
         onClick={() => {
           startCall();
           setIsCallStarted(true);
         }}
       >
-        <Icon name="videocall" size={20} color="#9333ea" />
+        <Icon name="videocall" size={20} color="text-white" />
       </button>
 
       {!isCallStarted && !isCallAccepted && incomingCall && (
@@ -335,7 +335,6 @@ const CallComponent = ({ currentUser, otherUser }) => {
         bsClass={"top-10 "}
       >
         <div className="relative z-10 flex flex-col items-center call-gradient justify-center">
-          {/* <!-- Caller Info --> */}
           <video
             ref={remoteVideoRef}
             autoPlay
@@ -351,9 +350,8 @@ const CallComponent = ({ currentUser, otherUser }) => {
               className="w-38 h-50 border-4 border-purple-500 border-4 border-double shadow-xl/30"
             />
           </div>
-          {/* <!-- Call Buttons --> */}
+
           <div className=" absolute bottom-0 left-3 w-full flex  space-x-8">
-            {/* <!-- Decline Button --> */}
             <button
               className="flex flex-col items-center mb-2"
               onClick={() => {
