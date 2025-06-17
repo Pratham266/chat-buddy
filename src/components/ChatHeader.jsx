@@ -92,7 +92,7 @@ const ChatHeader = ({
           <span
             className={`${
               status.isOnline ? "text-green-300" : "text-gray-300"
-            } text-sm`}
+            } text-xs`}
           >
             {status.isOnline ? "Online" : formatLastSeen(status.lastSeen)}
           </span>
