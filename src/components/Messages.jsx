@@ -69,112 +69,9 @@ const Messages = ({ messages, currentUser }) => {
           messages[index + 1].senderId !== msg.senderId;
         const { text, mediaUrl, senderId, timestamp, status } = msg;
         const downloadUrl =
-          mediaUrl && mediaUrl.replace("/upload/", "/upload/fl_attachment/");
+          mediaUrl &&
+          mediaUrl?.url.replace("/upload/", "/upload/fl_attachment/");
         return (
-          // <React.Fragment key={msg.id}>
-          //   {/* Date Separator */}
-          //   {showDateSeparator && (
-          //     <>
-          //       <div className="flex justify-center py-2">
-          //         <span className="bg-gray-200 text-gray-700 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-sm ">
-          //           {msgDate}
-          //         </span>
-          //       </div>
-          //     </>
-          //   )}
-
-          //   {/* Message Row */}
-          //   <div
-          //     className={`flex ${
-          //       isOwnerMessage ? "justify-end" : "items-start space-x-2"
-          //     } ${"mb-2"}`}
-          //   >
-          //     {isOwnerMessage ? (
-          //       <div className="flex flex-col items-end space-y-1">
-          //         <div className="relative bg-[#dfc3ff] p-3 rounded-xl rounded-br-none text-sm max-w-xs text-[#1f1f1f]">
-          //           {mediaUrl && (
-          //             <>
-          //               <div className="mb-1 ">
-          //                 <a
-          //                   href={downloadUrl}
-          //                   download // ✅ tell browser to download it
-          //                   target="blank"
-          //                   rel="noopener noreferrer"
-          //                   onClick={(e) => {
-          //                     e.stopPropagation();
-          //                   }}
-          //                 >
-          //                   <Icon name="download" size={20} color={"#2d143e"} />
-          //                 </a>
-          //               </div>
-          //               <Img
-          //                 className="w-60 h-60 rounded-sm"
-          //                 src={mediaUrl}
-          //                 loader={<ImageLoader />}
-          //                 alt={`chat-imag-${senderId}-${index}`}
-          //               />
-          //             </>
-          //           )}
-          //           {text && (
-          //             <div className={`pr-10 ${mediaUrl ? "mt-2" : ""}`}>
-          //               {text}
-          //             </div>
-          //           )}
-
-          //           <div className="absolute bottom-0 right-1 flex items-center space-x-1 text-[8px] text-gray-800">
-          //             <span>{formatTime(timestamp)}</span>
-          //             <Icon
-          //               name={status === "S" ? "doubleTick" : "singleTick"}
-          //               size={15}
-          //               color={"b20ffd"}
-          //             />
-          //           </div>
-          //         </div>
-          //       </div>
-          //     ) : (
-          //       <div className="flex space-x-2 items-end">
-          //         {/* {showProfileIcon && (
-          //           <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-          //             A
-          //           </div>
-          //         )} */}
-          //         <div
-          //           className={`relative bg-[#f7b0fb] p-3 rounded-xl rounded-tl-none text-sm max-w-xs text-[#1f1f1f] `}
-          //         >
-          //           {mediaUrl && (
-          //             <>
-          //               <div className="mb-1">
-          //                 <a
-          //                   href={downloadUrl}
-          //                   download // ✅ tell browser to download it
-          //                   target="blank"
-          //                   rel="noopener noreferrer"
-          //                   onClick={(e) => {
-          //                     e.stopPropagation();
-          //                   }}
-          //                 >
-          //                   <Icon name="download" size={20} color={"#2d143e"} />
-          //                 </a>
-          //               </div>
-          //               <Img
-          //                 className="w-60 h-60 rounded-sm"
-          //                 src={mediaUrl}
-          //                 loader={<ImageLoader />}
-          //                 alt={`chat-imag-${senderId}-${index}`}
-          //               />
-          //             </>
-          //           )}
-          //           <div className={`pr-10 ${mediaUrl ? "mt-2" : ""}`}>
-          //             {text}
-          //           </div>
-          //           <div className="absolute bottom-0 right-2 text-[8px] text-gray-800">
-          //             {formatTime(timestamp)}
-          //           </div>
-          //         </div>
-          //       </div>
-          //     )}
-          //   </div>
-          // </React.Fragment>
           <React.Fragment key={msg.id}>
             {/* Date Separator */}
             {showDateSeparator && (
@@ -214,18 +111,28 @@ const Messages = ({ messages, currentUser }) => {
                             />
                           </a>
                         </div>
-                        <Img
-                          className="w-60 h-60 rounded-md object-cover"
-                          src={mediaUrl}
-                          loader={<ImageLoader />}
-                          alt={`chat-image-${senderId}-${index}`}
-                        />
+                        {mediaUrl?.type === "image" ? (
+                          <Img
+                            className="w-60 h-60 rounded-md object-cover"
+                            src={mediaUrl.url}
+                            loader={<ImageLoader />}
+                            alt={`chat-image-${senderId}-${index}`}
+                          />
+                        ) : mediaUrl?.type === "video" ? (
+                          <video
+                            className="w-60 h-60 rounded-md object-cover"
+                            src={mediaUrl.url}
+                            controls
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : null}
                       </>
                     )}
                     {text && (
                       <div
                         className={`${
-                          mediaUrl ? "mt-2" : ""
+                          mediaUrl?.url ? "mt-2" : ""
                         } break-words pr-14 `}
                       >
                         {text}
@@ -275,16 +182,28 @@ const Messages = ({ messages, currentUser }) => {
                             />
                           </a>
                         </div>
-                        <Img
-                          className="w-60 h-60 rounded-md object-cover"
-                          src={mediaUrl}
-                          loader={<ImageLoader />}
-                          alt={`chat-image-${senderId}-${index}`}
-                        />
+                        {mediaUrl?.type === "image" ? (
+                          <Img
+                            className="w-60 h-60 rounded-md object-cover"
+                            src={mediaUrl.url}
+                            loader={<ImageLoader />}
+                            alt={`chat-image-${senderId}-${index}`}
+                          />
+                        ) : mediaUrl?.type === "video" ? (
+                          <video
+                            className="w-60 h-60 rounded-md object-cover"
+                            src={mediaUrl.url}
+                            controls
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : null}
                       </>
                     )}
                     <div
-                      className={`${mediaUrl ? "mt-2" : ""} break-words pr-14`}
+                      className={`${
+                        mediaUrl?.url ? "mt-2" : ""
+                      } break-words pr-14`}
                     >
                       {text}
                     </div>

@@ -31,13 +31,16 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
   }, []);
 
   const uploadToCloudinary = async (file) => {
+    const isVideo = file.type.startsWith("video/");
+    const type = isVideo ? "video" : "image";
+
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "chat_buddy"); // your unsigned preset
-    formData.append("folder", "chat_images");
+    formData.append("upload_preset", "chat_buddy");
+    formData.append("folder", isVideo ? "chat_videos" : "chat_images");
 
     const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/${type}/upload`,
       {
         method: "POST",
         body: formData,
@@ -48,9 +51,13 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
 
     if (data?.error) {
       setIsUploadMendiaError(data?.error?.message);
-      return;
+      return null;
     }
-    return data?.secure_url; // This is the image URL to store in Firestore
+
+    return {
+      type,
+      url: data?.secure_url,
+    };
   };
 
   const handleFileChange = async (e) => {
@@ -59,14 +66,22 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
     if (file) {
       setUploading(true);
       setIsModalOpen(true);
-      const imgUrl = await uploadToCloudinary(file);
-      setMediaUrl(imgUrl);
+
+      const mediaData = await uploadToCloudinary(file);
+
+      if (mediaData) {
+        setMediaUrl({
+          type: mediaData.type, // "image" or "video"
+          url: mediaData.url, // secure Cloudinary URL
+        });
+      }
+
       setUploading(false);
     }
   };
 
   const handleSend = async () => {
-    if (inputMessage.trim() === "" && mediaUrl.trim() === "") return;
+    if (inputMessage.trim() === "" && mediaUrl?.url.trim() === "") return;
     // const chatId = await getOrCreateChatId(currentUser.code, otherUser.code);
 
     await sendMessage(
@@ -105,77 +120,6 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
 
   return (
     <>
-      {/* <footer className="bg-[#f3ecf9] px-4 py-3 border-t flex items-center space-x-2 chat-editor relative">
-        {showEmojiPicker && (
-          <div className="absolute bottom-16 z-50">
-            <div ref={pickerRef}>
-              <EmojiPicker
-                onEmojiClick={handleEmojiSelect}
-                showPreview={false}
-                theme="dark"
-              />
-            </div>
-          </div>
-        )}
-
-        {isOtherTyping && (
-          <div className="absolute -top-[40px]   left-1/2 transform -translate-x-1/2 bg-gray-100 text-white px-6 py-2 rounded-full flex items-center space-x-2 shadow-md">
-            <div className="flex space-x-1">
-              <span
-                className="w-1.5 h-1.5 bg-black rounded-full animate-bounce"
-                style={{ animationDelay: "0s" }}
-              ></span>
-              <span
-                className="w-1.5 h-1.5 bg-black rounded-full animate-bounce"
-                style={{ animationDelay: "0.2s" }}
-              ></span>
-              <span
-                className="w-1.5 h-1.5 bg-black rounded-full animate-bounce"
-                style={{ animationDelay: "0.4s" }}
-              ></span>
-            </div>
-          </div>
-        )}
-
-        <div className="flex item-center justify-center">
-          <button
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            className="cursor-pointer bg-[#9333ea] text-white px-0.5 py-0.5 rounded-full hover:bg-[#7e22ce] mr-2"
-          >
-            <Icon name="smile" size={20} />
-          </button>
-
-          <input
-            type="file"
-            id="file-upload"
-            className="hidden"
-            onChange={handleFileChange}
-            accept="image/*"
-          />
-
-          <label
-            htmlFor="file-upload"
-            className=" cursor-pointer cursor-pointer bg-[#9333ea] text-white px-0.5 py-0.5 rounded-full hover:bg-[#7e22ce] inline-flex items-center justify-center"
-          >
-            <Icon name="upload" size={20} />
-          </label>
-        </div>
-        <input
-          type="text"
-          placeholder="Type your message..."
-          className="flex-1 px-4 py-2 bg-white text-[#1f1f1f] border border-gray-300 rounded-full placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400"
-          value={inputMessage}
-          onChange={handleInputChange}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        />
-
-        <button
-          className="cursor-pointer bg-[#9333ea] text-white px-1 py-1  rounded-full hover:bg-[#7e22ce]"
-          onClick={handleSend}
-        >
-          <Icon name="send" size={24} />
-        </button>
-      </footer> */}
       <footer className="bg-white dark:bg-gray-800 px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center space-x-3 relative shadow-lg">
         {showEmojiPicker && (
           <div className="absolute bottom-full left-4 mb-3 z-50">
@@ -211,7 +155,7 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
             id="file-upload"
             className="hidden"
             onChange={handleFileChange}
-            accept="image/*" // Corrected accept attribute for common image formats
+            accept="image/*,video/*" // Accept both images and videos
           />
 
           <label
@@ -252,33 +196,6 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
           title={"Send Image"}
           bsClass={"top-30"}
         >
-          {/* <div className="w-full relative h-auto p-1 border border-gray-200 rounded-md max-w-sm mx-auto flex items-center justify-center bg-[#2d143e]">
-            {uploading ? (
-              <div className="dotLoader-animation">
-                <Icon name="dotloader" size={100} color={"#f7b0fb"} />
-              </div>
-            ) : (
-              <>
-                {isUploadMendiaError && (
-                  <div className="text-red-900 bg-[#f4ecf9] p-1 rounded max-h-[300px] overflow-y-auto">
-                    <p className="font-bold">
-                      Sorry We Note Able To Upload An Image
-                    </p>
-                    <span text="font-bold">Reason: </span>
-                    <span className="text-sm italic">
-                      {isUploadMendiaError}
-                    </span>
-                  </div>
-                )}
-                <Img
-                  src={mediaUrl}
-                  alt="uploadImage"
-                  className="rounded-md max-w-full h-auto"
-                  loader={<ImageLoader />}
-                />
-              </>
-            )}
-          </div> */}
           <div className="w-full relative h-auto p-2 border-2 border-dashed border-purple-400 dark:border-purple-600 rounded-lg max-w-sm mx-auto flex items-center justify-center bg-purple-50 dark:bg-gray-700 min-h-[150px]">
             {uploading ? (
               <div className="flex flex-col items-center justify-center text-purple-600 dark:text-purple-300">
@@ -295,8 +212,7 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
                       name="error"
                       size={40}
                       color="text-red-600 dark:text-red-400"
-                    />{" "}
-                    {/* Assuming 'error' icon */}
+                    />
                     <p className="font-bold mt-2 text-lg">Upload Failed!</p>
                     <span className="text-sm italic mt-1 max-h-[100px] overflow-y-auto">
                       {isUploadMendiaError}
@@ -306,12 +222,26 @@ const ChatEditor = ({ currentUser, otherUser, isOtherTyping, chatId }) => {
                     </p>
                   </div>
                 )}
-                <Img
-                  src={mediaUrl}
-                  alt="Uploaded media preview"
-                  className="rounded-md max-w-full h-auto max-h-[calc(100%-10px)] object-contain" // Added object-contain
-                  loader={<ImageLoader />}
-                />
+
+                {/* Media Preview */}
+                {mediaUrl?.type === "image" && (
+                  <Img
+                    src={mediaUrl.url}
+                    alt="Uploaded image preview"
+                    className="rounded-md max-w-full h-auto max-h-[calc(100%-10px)] object-contain"
+                    loader={<ImageLoader />}
+                  />
+                )}
+
+                {mediaUrl?.type === "video" && (
+                  <video
+                    src={mediaUrl.url}
+                    controls
+                    className="rounded-md max-w-full h-auto max-h-[calc(100%-10px)] object-contain"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )}
               </>
             )}
           </div>
